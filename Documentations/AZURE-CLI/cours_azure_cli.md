@@ -1,21 +1,24 @@
-# 🚀 Cours Complet Azure CLI
+# 🚀 Cours Complet Azure CLI☁️
 
 ## 📚 Table des matières
 
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Configuration initiale](#configuration-initiale)
-4. [Commandes de base](#commandes-de-base)
-5. [Gestion des ressources](#gestion-des-ressources)
-6. [Stockage](#stockage)
-7. [Réseaux](#réseaux)
-8. [Sécurité et identité](#sécurité-et-identité)
-9. [Surveillance et logs](#surveillance-et-logs)
-10. [Bonnes pratiques](#bonnes-pratiques)
+1. [🎯 Introduction](#introduction)
+2. [💿 Installation](#installation)
+3. [⚙️ Configuration initiale](#configuration-initiale)
+4. [🎮 Commandes de base](#commandes-de-base)
+5. [🏗️ Gestion des ressources](#gestion-des-ressources)
+6. [💾 Stockage](#stockage)
+7. [🌐 Réseaux](#reseaux)
+8. [🔐 Sécurité et identité](#securite-et-identite)
+9. [📊 Surveillance et logs](#surveillance-et-logs)
+10. [🎯 Bonnes pratiques](#bonnes-pratiques)
+11. [🚀 Commandes avancées](#commandes-de-base)
+12. [📚 Ressources supplémentaires](#ressources-supplementaires)
+13. [🎉 Conclusion](#conclusion)
 
 ---
 
-## 🎯 Introduction
+## 🎯 Introduction {#introduction}
 
 ### Qu'est-ce qu'Azure CLI ?
 
@@ -31,7 +34,7 @@
 
 ---
 
-## 💿 Installation
+## 💿 Installation {#installation}
 
 ### Windows
 
@@ -67,7 +70,7 @@ az --version
 
 ---
 
-## ⚙️ Configuration initiale
+## ⚙️ Configuration initiale {#configuration-initiale}
 
 ### 🔐 Connexion à Azure
 
@@ -162,7 +165,7 @@ az vm list --query "length([])"
 
 ---
 
-## 🏗️ Gestion des ressources
+## 🏗️ Gestion des ressources {#gestion-des-ressources}
 
 ### 📁 Groupes de ressources
 
@@ -299,7 +302,7 @@ az container delete --resource-group MonGroupeRG --name MonConteneur --yes
 
 ---
 
-## 💾 Stockage
+## 💾 Stockage {#stockage}
 
 ### 📦 Comptes de stockage
 
@@ -376,7 +379,7 @@ az storage file upload \
 
 ---
 
-## 🌐 Réseaux
+## 🌐 Réseaux {#reseaux}
 
 ### 🔌 Réseaux virtuels (VNet)
 
@@ -456,7 +459,7 @@ az network lb create \
 
 ---
 
-## 🔐 Sécurité et identité
+## 🔐 Sécurité et identité {#securite-et-identite}
 
 ### 👤 Azure Active Directory (Entra ID)
 
@@ -532,7 +535,7 @@ az keyvault secret list \
 
 ---
 
-## 📊 Surveillance et logs
+## 📊 Surveillance et logs {#surveillance-et-logs}
 
 ### 📈 Azure Monitor
 
@@ -577,7 +580,7 @@ az monitor metrics alert create \
 
 ---
 
-## 🎯 Bonnes pratiques
+## 🎯 Bonnes pratiques {#bonnes-pratiques}
 
 ### 1. 🔒 Sécurité
 
@@ -706,7 +709,7 @@ az deployment group validate \
 
 ---
 
-## 🚀 Commandes avancées
+## 🚀 Commandes avancées {#commandes-de-base}
 
 ### Infrastructure as Code avec ARM Templates
 
@@ -752,7 +755,7 @@ az extension list --output table
 
 ---
 
-## 📚 Ressources supplémentaires
+## 📚 Ressources supplémentaires {#ressources-supplementaires}
 
 ### 🔗 Liens utiles
 
@@ -769,7 +772,7 @@ az extension list --output table
 
 ---
 
-## 🎉 Conclusion
+## 🎉 Conclusion {#conclusion}
 
 Azure CLI est un outil puissant qui vous permet de :
 
@@ -787,7 +790,3 @@ Azure CLI est un outil puissant qui vous permet de :
 5. 🎯 Passez une certification Azure
 
 ---
-
-**Bon apprentissage avec Azure CLI! 🚀☁️**
-
-*Dernière mise à jour: 2024*

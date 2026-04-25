@@ -2,37 +2,37 @@
 
 ## Sommaire
 
-1. [Introduction : l’analogie de la société d’habitation](#1-introduction--lanalogie-de-la-société-dhabitation)
-2. [Rappel des fondamentaux : VNet, CIDR et subnets](#2-rappel-des-fondamentaux--vnet-cidr-et-subnets)
-3. [Les composants de sécurité réseau](#3-les-composants-de-sécurité-réseau)
+1. [Introduction : l’analogie de la société d’habitation](#1-introduction)
+2. [Rappel des fondamentaux : VNet, CIDR et subnets](#2-rappel)
+3. [Les composants de sécurité réseau](#3-composants)
    - 3.1 Network Security Group (NSG)
    - 3.2 Application Security Group (ASG)
    - 3.3 Azure Firewall
    - 3.4 Web Application Firewall (WAF)
    - 3.5 Network Access Control List (NACL) – clarification
-4. [Routage et connectivité](#4-routage-et-connectivité)
+4. [Routage et connectivité](#4-routage)
    - 4.1 Tables de routage (Route Tables) et routes système
    - 4.2 NAT Gateway
    - 4.3 Azure DNS
-5. [Équilibrage de charge](#5-équilibrage-de-charge)
+5. [Équilibrage de charge](#5-charge)
    - 5.1 Azure Load Balancer (L4)
    - 5.2 Application Gateway (L7)
-6. [Architecture complète d’une application multi‑niveaux](#6-architecture-complète-dune-application-multi-niveaux)
+6. [Architecture complète d’une application multi‑niveaux](#6-architecture)
    - 6.1 Conception du VNet et des subnets
    - 6.2 Déploiement sur deux zones de disponibilité
    - 6.3 Pare-feu et WAF en périphérie
    - 6.4 Équilibrage de charge externe et interne
    - 6.5 Règles de sécurité (NSG, ASG)
    - 6.6 Schéma détaillé du flux réseau
-7. [Connecter plusieurs VNets : Peering et VPN Gateway](#7-connecter-plusieurs-vnets--peering-et-vpn-gateway)
+7. [Connecter plusieurs VNets : Peering et VPN Gateway](#7-vnets-peering-vpn-gateway)
    - 7.1 VNet Peering
    - 7.2 VPN Gateway (connexion site‑à‑site)
-8. [Bonnes pratiques avancées](#8-bonnes-pratiques-avancées)
+8. [Bonnes pratiques avancées](#8-bonnes-pratiques)
 9. [Conclusion](#9-conclusion)
 
 ---
 
-## 1. Introduction : l’analogie de la société d’habitation
+## 1. Introduction : l’analogie de la société d’habitation {#1-introduction}
 
 Pour bien comprendre le réseau Azure, prenons l’image d’une **société d’habitation** (residential society) :
 
@@ -49,7 +49,7 @@ Cette analogie nous suivra tout au long du cours.
 
 ---
 
-## 2. Rappel des fondamentaux : VNet, CIDR et subnets
+## 2. Rappel des fondamentaux : VNet, CIDR et subnets {#2-rappel}
 
 Un **Virtual Network (VNet)** est un réseau privé virtuel dans Azure. On définit sa taille avec une notation **CIDR** (par exemple `10.0.0.0/16`). Ce VNet est découpé en **subnets** pour organiser les ressources :
 
@@ -60,7 +60,7 @@ Dans notre analogie, le VNet est le terrain clôturé, et les subnets sont les d
 
 ---
 
-## 3. Les composants de sécurité réseau
+## 3. Les composants de sécurité réseau {#3-composants}
 
 ### 3.1 Network Security Group (NSG)
 
@@ -93,7 +93,7 @@ Le terme **NACL** est souvent utilisé chez AWS pour un filtrage **stateless** a
 
 ---
 
-## 4. Routage et connectivité
+## 4. Routage et connectivité {#4-routage}
 
 ### 4.1 Tables de routage (Route Tables) et routes système
 
@@ -111,11 +111,11 @@ Azure crée automatiquement des **routes système** pour permettre la communicat
 
 **Azure DNS** est un service d’hébergement de domaines. Vous pouvez y gérer vos enregistrements DNS (A, CNAME, etc.) et les associer à vos ressources Azure (load balancer, application gateway, etc.).
 
-- **Rôle** : l’annuaire téléphonique de la ville, qui traduit un nom (ex: www.monsite.com) en adresse (IP).
+- **Rôle** : l’annuaire téléphonique de la ville, qui traduit un nom (ex: [www.monsite.com](www.monsite.com)) en adresse (IP).
 
 ---
 
-## 5. Équilibrage de charge
+## 5. Équilibrage de charge {#5-charge}
 
 ### 5.1 Azure Load Balancer (L4)
 
@@ -131,7 +131,7 @@ Azure crée automatiquement des **routes système** pour permettre la communicat
 
 ---
 
-## 6. Architecture complète d’une application multi‑niveaux
+## 6. Architecture complète d’une application multi‑niveaux {#6-architecture}
 
 ### 6.1 Conception du VNet et des subnets
 
@@ -140,7 +140,7 @@ Prenons un projet typique : une application web avec frontend, backend API et ba
 **VNet :** `10.0.0.0/16`
 
 | Subnet | Plage CIDR | Rôle |
-|--------|------------|------|
+| -------- | ------------ | ------ |
 | `snet-web` | `10.0.1.0/24` | Serveurs web (frontend) |
 | `snet-app` | `10.0.2.0/24` | Serveurs d’application (API) |
 | `snet-data` | `10.0.3.0/24` | Bases de données |
@@ -181,7 +181,7 @@ Pour chaque niveau, on déploie des VM dans les deux zones (par exemple VM web e
 
 Voici le parcours d’une requête utilisateur :
 
-```
+```text
 Utilisateur → Internet → Azure DNS (résolution du nom)
               ↓
           Application Gateway (avec WAF) – L7
@@ -202,13 +202,14 @@ Utilisateur → Internet → Azure DNS (résolution du nom)
 ```
 
 **Détails supplémentaires :**
+
 - Les VM web peuvent avoir besoin d’accéder à Internet pour des mises à jour. On utilise une **NAT Gateway** attachée au subnet `snet-web` pour leur fournir une IP publique de sortie.
 - Toutes les communications entre subnets sont contrôlées par NSG et éventuellement par les règles du Firewall si on a forcé le routage via lui.
 - Le trafic entre zones de disponibilité reste dans le VNet et est à faible latence.
 
 ---
 
-## 7. Connecter plusieurs VNets : Peering et VPN Gateway
+## 7. Connecter plusieurs VNets : Peering et VPN Gateway {#7-vnets-peering-vpn-gateway}
 
 ### 7.1 VNet Peering
 
@@ -226,7 +227,7 @@ Le **VNet Peering** permet de connecter deux VNets (dans la même région ou des
 
 ---
 
-## 8. Bonnes pratiques avancées
+## 8. Bonnes pratiques avancées {#8-bonnes-pratiques}
 
 - **Toujours segmenter** les fonctions dans des subnets distincts avec des NSG dédiés.
 - **Utiliser les ASG** pour éviter de coder en dur des adresses IP dans les règles NSG.
@@ -239,11 +240,12 @@ Le **VNet Peering** permet de connecter deux VNets (dans la même région ou des
 
 ---
 
-## 9. Conclusion
+## 9. Conclusion {#9-conclusion}
 
 Azure offre un éventail complet de services réseau pour construire des architectures robustes, sécurisées et évolutives. De la simple VM isolée à l’application mondiale répartie sur plusieurs régions, en passant par les connexions hybrides, vous disposez de tous les outils nécessaires. La clé est de bien comprendre le rôle de chaque composant – VNet, subnets, NSG, ASG, Azure Firewall, load balancers, passerelles – et de les assembler selon les principes de défense en profondeur.
 
 > **Ce qu’il faut retenir** :  
+>
 > - **VNet** = votre réseau privé.  
 > - **Subnets** = zones fonctionnelles.  
 > - **NSG/ASG** = sécurité fine.  
