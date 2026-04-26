@@ -9,15 +9,18 @@
 1. [Concepts Fondamentaux](#1-concepts-fondamentaux)
 2. [Azure VPN Gateway — Guide Complet](#2-azure-vpn-gateway-guide-complet)
 3. [Azure Firewall — Guide Complet](#3-azure-firewall-guide-complet)
-4. [Comparaison AWS vs Azure](#4-comparaison-aws-vs-azure)
-5. [Architectures Intégrées](#5-architectures-integrees)
-6. [Cas d'Usage Réels](#6-cas-dusage-reels)
-7. [Configuration Pas à Pas](#7-configuration-pas-a-pas)
-8. [Infrastructure as Code](#8-infrastructure-as-code)
-9. [Sécurité & Bonnes Pratiques](#9-securite-bonnes-pratiques)
-10. [Diagnostic & Dépannage](#10-diagnostic-depannage)
-11. [Exercices Pratiques](#11-exercices-pratiques)
-12. [Ressources & Références](#12-ressources-references)
+4. [Firewalls Auto-Managés — Concepts & Configuration](#4-firewalls-auto-manages--concepts--configuration)
+5. [Azure Firewall Manager — Gestion Centralisée](#5-azure-firewall-manager--gestion-centralisee)
+6. [Comparaison Globale: Tous les Types de Firewalls](#6-comparaison-globale-tous-les-types-de-firewalls)
+7. [Comparaison AWS vs Azure](#7-comparaison-aws-vs-azure)
+8. [Architectures Intégrées](#8-architectures-integrees)
+9. [Cas d'Usage Réels](#9-cas-dusage-reels)
+10. [Configuration Pas à Pas](#10-configuration-pas-a-pas)
+11. [Infrastructure as Code](#11-infrastructure-as-code)
+12. [Sécurité & Bonnes Pratiques](#12-securite-bonnes-pratiques)
+13. [Diagnostic & Dépannage](#13-diagnostic-depannage)
+14. [Exercices Pratiques](#14-exercices-pratiques)
+15. [Ressources & Références](#15-ressources-references)
 
 ---
 
@@ -491,7 +494,665 @@ Azure Firewall peut bloquer les adresses IP/domaines **connus pour être malveil
 
 ---
 
-## 4. 📊 Comparaison AWS vs Azure {#4-comparaison-aws-vs-azure}
+## 4. � Firewalls Auto-Managés — Concepts & Configuration {#4-firewalls-auto-manages--concepts--configuration}
+
+### 4.1 Qu'est-ce qu'un Firewall Auto-Géré?
+
+Un **Firewall auto-géré** (ou **host-based firewall**) est un logiciel installé directement sur une machine (Windows, Linux, macOS) ou VM qui contrôle le trafic réseau entrant/sortant du système.
+
+#### Schéma Architecture
+
+```
+┌──────────────────────────────────────────────────┐
+│               MACHINE / VM                       │
+│                                                  │
+│  ┌────────────────────────────────────────────┐ │
+│  │  Application (Web Server, DB, etc)         │ │
+│  │  Listening sur ports: 80, 443, 3389, etc   │ │
+│  └────────────────────────────────────────────┘ │
+│                    ↓                             │
+│  ┌────────────────────────────────────────────┐ │
+│  │   HOST-BASED FIREWALL                      │ │
+│  │   • Windows Defender Firewall              │ │
+│  │   • Linux iptables / firewalld             │ │
+│  │   • Third-party (ZoneAlarm, etc)           │ │
+│  │                                            │ │
+│  │   Contrôle:                                │ │
+│  │   • Applications autorisées                │ │
+│  │   • Ports ouverts/fermés                   │ │
+│  │   • Connexions entrantes/sortantes         │ │
+│  │   • Signatures malveillantes               │ │
+│  └────────────────────────────────────────────┘ │
+│                    ↓                             │
+│  ┌────────────────────────────────────────────┐ │
+│  │   Carte Réseau (NIC) — Vers le réseau     │ │
+│  └────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────┘
+           ↓ (Internet/LAN)
+```
+
+### 4.2 Types de Firewalls Auto-Managés
+
+#### 1. Windows Defender Firewall (Windows)
+
+**Natif** sur Windows 10/11/Server. Gratuit, intégré au système.
+
+##### Concepts Clés
+
+```
+┌─────────────────────────────────────────────┐
+│  WINDOWS DEFENDER FIREWALL CONCEPTS         │
+├─────────────────────────────────────────────┤
+│                                             │
+│ 1. PROFILES (Profils de réseau)            │
+│    • Domain: Connecté au AD                │
+│    • Private: Réseau maison/bureau perso   │
+│    • Public: WiFi public (le plus strict)  │
+│                                             │
+│    Chaque profil a ses propres règles      │
+│                                             │
+│ 2. RULES (Règles)                          │
+│    • Inbound: Trafic entrant               │
+│    • Outbound: Trafic sortant              │
+│                                             │
+│    Chaque règle spécifie:                  │
+│    - Protocol (TCP, UDP)                   │
+│    - Port (80, 443, 3389)                  │
+│    - Direction (In/Out)                    │
+│    - Action (Allow/Block)                  │
+│    - Program/Service                       │
+│    - Remotes IPs                           │
+│                                             │
+│ 3. STATES (États)                          │
+│    • ON (Firewall actif)                   │
+│    • OFF (Désactivé, pas de protection)    │
+│    • Peut avoir des exceptions             │
+│                                             │
+│ 4. NOTIFICATION (Alertes)                  │
+│    • Alerte si une app veut accéder réseau │
+│    • User peut Allow/Block                 │
+│    • Crée automatiquement une règle        │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+##### Configuration Manuelle (Exemples)
+
+```powershell
+# Afficher l'état du firewall
+Get-NetFirewallProfile
+
+# Activer firewall pour tous les profils
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+
+# Créer une règle pour autoriser RDP (port 3389)
+New-NetFirewallRule -DisplayName "Allow RDP" `
+  -Direction Inbound `
+  -Protocol TCP `
+  -LocalPort 3389 `
+  -Action Allow
+
+# Créer une règle pour bloquer un programme
+New-NetFirewallRule -DisplayName "Block Suspicious App" `
+  -Direction Outbound `
+  -Program "C:\Program Files\SuspiciousApp\app.exe" `
+  -Action Block
+
+# Lister les règles
+Get-NetFirewallRule | Get-NetFirewallRulePortFilter
+
+# Supprimer une règle
+Remove-NetFirewallRule -DisplayName "Allow RDP"
+```
+
+#### 2. Linux Firewall: iptables & firewalld
+
+**Standard** sur Linux (RHEL, Ubuntu, CentOS). En ligne de commande.
+
+##### Concepts
+
+```
+┌─────────────────────────────────────────────┐
+│   LINUX FIREWALL CONCEPTS (iptables)        │
+├─────────────────────────────────────────────┤
+│                                             │
+│ 1. TABLES (Tableaux de règles)              │
+│    • filter: Filtrage standard (INPUT,     │
+│              OUTPUT, FORWARD)              │
+│    • nat: Network Address Translation       │
+│    • mangle: Modification des packets      │
+│                                             │
+│ 2. CHAINS (Chaînes de traitement)          │
+│    • INPUT: Trafic entrant vers machine    │
+│    • OUTPUT: Trafic sortant depuis machine │
+│    • FORWARD: Routage transit             │
+│                                             │
+│ 3. RULES (Règles)                          │
+│    • Protocole (TCP, UDP)                  │
+│    • Port source/destination               │
+│    • Adresse source/destination            │
+│    • Action: ACCEPT, DROP, REJECT         │
+│                                             │
+│ 4. POLICY (Politique par défaut)           │
+│    • Default policy INPUT = ACCEPT/DROP   │
+│      (Autoriser tout/Bloquer tout)         │
+│    • Default policy OUTPUT = ACCEPT/DROP  │
+│    • Default policy FORWARD = DROP         │
+│                                             │
+│ 5. ORDRE D'EXÉCUTION                        │
+│    First matching rule wins                 │
+│    (ordre des règles = important)           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+##### Configuration (Exemples)
+
+```bash
+# Voir l'état du firewall (iptables)
+sudo iptables -L -n -v
+
+# Voir les règles avec numéros
+sudo iptables -L -n --line-numbers
+
+# Autoriser SSH (port 22) entrant
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Bloquer un port (ex: port 23 - Telnet)
+sudo iptables -A INPUT -p tcp --dport 23 -j DROP
+
+# Autoriser HTTP (port 80)
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+# Autoriser HTTPS (port 443)
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Rejeter tout trafic par défaut (Deny-All)
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+
+# Sauvegarder les règles (persistantes après reboot)
+sudo iptables-save > /etc/iptables/rules.v4
+
+# Restaurer les règles
+sudo iptables-restore < /etc/iptables/rules.v4
+```
+
+##### firewalld (Moderne)
+
+```bash
+# Vérifier l'état
+sudo firewall-cmd --state
+
+# Activer/Démarrer
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+
+# Ajouter une zone
+sudo firewall-cmd --new-zone=trusted --permanent
+
+# Autoriser un port
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --add-port=3306/tcp --zone=internal --permanent
+
+# Autoriser un service (SSH, HTTP, etc)
+sudo firewall-cmd --add-service=ssh --permanent
+sudo firewall-cmd --add-service=http --permanent
+
+# Bloquer une adresse IP
+sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.100" reject' --permanent
+
+# Recharger les règles
+sudo firewall-cmd --reload
+```
+
+#### 3. Third-Party Firewalls
+
+```
+┌─────────────────────────────────────────────────────────┐
+│      FIREWALLS TIERS (Windows/Linux/macOS)              │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│ • **ZoneAlarm**: GUI simple, protection avancée        │
+│ • **Comodo Firewall**: Gratuit, granulaire             │
+│ • **Little Snitch (macOS)**: Transparent, détaillé     │
+│ • **Sophos Home**: Gratuit, anti-malware intégré       │
+│ • **Kaspersky**: Payant, détection intrusion           │
+│ • **Avast**: Gratuit avec antivirus                    │
+│ • **Bitdefender**: Payant, machine learning             │
+│                                                         │
+│ AVANTAGES vs Natif:                                     │
+│ ✅ Interface graphique intuitive                        │
+│ ✅ Alertes visuelles claires                            │
+│ ✅ Anti-malware intégré souvent                         │
+│ ✅ Support technique                                    │
+│ ✅ Contrôle applications granulaire                     │
+│                                                         │
+│ INCONVÉNIENTS:                                          │
+│ ❌ Coût (souvent payant)                                │
+│ ❌ Surcharge système                                    │
+│ ❌ Risque de conflits avec Windows Defender            │
+│ ❌ Mises à jour potentiellement invasives              │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 4.3 Avantages & Limitations
+
+```
+┌─────────────────────────────────────────────────────┐
+│  AVANTAGES FIREWALLS AUTO-MANAGÉS                   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ ✅ Granularité: Contrôle par application           │
+│ ✅ Protection locale: Pas dépendant du réseau      │
+│ ✅ Gratuit (Windows Defender, iptables)             │
+│ ✅ Simple déploiement (pas d'équipement externe)   │
+│ ✅ Alertes locales immédiates                       │
+│ ✅ Performance: Faible overhead                     │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│  LIMITATIONS FIREWALLS AUTO-MANAGÉS                 │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ ❌ Gestion décentralisée (règles par machine)      │
+│ ❌ Pas d'inspection profonde (DPI limited)         │
+│ ❌ Pas de threat intelligence centralisée           │
+│ ❌ Difficile à maintenir pour 100+ machines        │
+│ ❌ Pas de logs centralisés                          │
+│ ❌ Risque d'être contourné par malware local       │
+│ ❌ User peut le désactiver facilement               │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+### 4.4 Bonnes Pratiques
+
+```
+✅ CONFIGURATION OPTIMALE:
+  □ Activer TOUJOURS le firewall (host-based)
+  □ Utiliser Deny-All par défaut (bloc par défaut)
+  □ Autoriser explicitement les apps/services nécessaires
+  □ Logs locaux: Envoyer vers système centralisé (SIEM)
+  □ Synchroniser avec antivirus (Windows Defender)
+  □ Audit mensuel des règles
+  □ Désactiver pour updates uniquement (temporairement)
+  □ Notifications d'alerte activées
+```
+
+---
+
+## 5. ☁️ Azure Firewall Manager — Gestion Centralisée {#5-azure-firewall-manager--gestion-centralisee}
+
+### 5.1 Qu'est-ce qu'Azure Firewall Manager?
+
+**Azure Firewall Manager** est un service cloud qui permet de **gérer centralement** plusieurs instances d'Azure Firewall (et d'autres firewalls) à travers plusieurs ressources, régions et subscriptions.
+
+#### Vue d'Ensemble
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                  AZURE FIREWALL MANAGER                        │
+│                  (Service Centralisé)                          │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │  Tableau de Bord Unifié                                  │ │
+│  │  • Vue globale de tous les firewalls                     │ │
+│  │  • Compliance status                                    │ │
+│  │  • Alertes consolidées                                  │ │
+│  └──────────────────────────────────────────────────────────┘ │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │  Policy Management                                       │ │
+│  │  • Politique de firewall centralisée                    │ │
+│  │  • Appliquer à plusieurs firewalls automatiquement      │ │
+│  │  • Versioning et rollback de politiques                │ │
+│  └──────────────────────────────────────────────────────────┘ │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │  Threat Intelligence                                     │ │
+│  │  • Centralisé                                            │ │
+│  │  • Appliqué à tous les firewalls                        │ │
+│  │  • Intelligence partagée                                │ │
+│  └──────────────────────────────────────────────────────────┘ │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+         │          │          │          │
+         ↓          ↓          ↓          ↓
+    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+    │ FW 1   │ │ FW 2   │ │ FW 3   │ │ FW N   │
+    │ West   │ │ East   │ │ EU     │ │ Asia   │
+    │ Region │ │ Region │ │ Region │ │ Region │
+    └────────┘ └────────┘ └────────┘ └────────┘
+      (Toutes gérées par une politique centralisée)
+```
+
+### 5.2 Concepts Clés
+
+#### 1. Firewall Policies
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  FIREWALL POLICY (Politique Centralisée)               │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│ • Une politique = Une ressource Azure                  │
+│ • Peut être appliquée à plusieurs firewalls            │
+│ • Contient TOUTES les règles (NAT, Network, App)      │
+│ • Hiérarchie: Parent → Base Policy → Rules           │
+│                                                         │
+│ STRUCTURE:                                              │
+│                                                         │
+│  Policy (Central)                                       │
+│  ├─ Rule Collection Groups (Priorité 100)             │
+│  │  ├─ NAT Rules                                       │
+│  │  ├─ Network Rules                                   │
+│  │  └─ Application Rules                              │
+│  └─ Child Policy (Héritage)                           │
+│     └─ Rule Collection Groups (Peut étendre)          │
+│                                                         │
+│ AVANTAGES:                                              │
+│ ✅ Gérer 1 politique = 10 firewalls                    │
+│ ✅ Modifications atomiques (tous les FWs à la fois)   │
+│ ✅ Versioning: Historique des changements             │
+│ ✅ Hiérarchie permet specialisation                    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### 2. Virtual Hub (Hub-Spoke)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  VIRTUAL HUB Architecture (avec Firewall Manager)   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  Virtual HUB (Region: West EU)                     │
+│  ┌─────────────────────────────────────────────┐  │
+│  │  Routing Infrastructure                     │  │
+│  │                                             │  │
+│  │  Firewall: Automatiquement routé            │  │
+│  │  VPN Gateways: Intégré                      │  │
+│  │  ExpressRoute: Pour on-premise              │  │
+│  │                                             │  │
+│  │  Managed by: Azure Firewall Manager         │  │
+│  └─────────────────────────────────────────────┘  │
+│         ├─ Spoke VNet 1 (App)                     │
+│         ├─ Spoke VNet 2 (Data)                    │
+│         ├─ Spoke VNet 3 (Services)                │
+│         └─ On-Premise (VPN)                       │
+│                                                     │
+│  Tout le trafic traverse le Hub Firewall          │
+│  Une politique centralisée gère tous les accès    │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+#### 3. Secured Virtual Hubs
+
+```
+┌──────────────────────────────────────────────────┐
+│  SECURED VIRTUAL HUB (Nouveau concept)           │
+├──────────────────────────────────────────────────┤
+│                                                  │
+│ • Virtual Hub + Firewall = Secured Virtual Hub │
+│ • Firewall auto-managé par Azure                │
+│ • Pas besoin de créer séparé subnet             │
+│ • Routing auto-optimisé                         │
+│                                                  │
+│ STRUCTURE:                                       │
+│                                                  │
+│  Secured Virtual Hub (Automatique)              │
+│  ├─ Built-in Firewall                          │
+│  ├─ Routing Engine                              │
+│  ├─ VPN Gateway (S2S)                          │
+│  ├─ ExpressRoute Gateway                        │
+│  └─ Managed Policies (via Firewall Manager)    │
+│                                                  │
+│ COMPARE À Manual:                                │
+│ ❌ Manual: VNet + Firewall subnet (séparé)      │
+│ ✅ Secured Hub: Tout intégré + auto-managed    │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+### 5.3 Avantages vs Gestion Manuelle
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  AZURE FIREWALL MANAGER — AVANTAGES                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ✅ CENTRALISATION                                           │
+│    • 1 politique pour 100+ firewalls                        │
+│    • Modifié une fois = changement global                  │
+│    • Pas de dérive de configuration                        │
+│                                                             │
+│ ✅ SCALABILITÉ                                              │
+│    • Ajouter nouvelle région: Appliquer policy existante   │
+│    • Pas de reconfiguration manuelle                       │
+│                                                             │
+│ ✅ GOUVERNANCE                                              │
+│    • RBAC: Qui peut modifier les politiques?               │
+│    • Audit logs: Chaque modification trackée               │
+│    • Compliance: Vérifier adhérence à politiques           │
+│                                                             │
+│ ✅ VERSIONING                                               │
+│    • Historique des politiques                             │
+│    • Rollback à une version antérieure                     │
+│    • Changements granulaires tracés                        │
+│                                                             │
+│ ✅ THREAT INTEL CENTRALISÉE                                │
+│    • Une source = appliquée à tous                         │
+│    • IoCs (Indicators of Compromise) partagés             │
+│                                                             │
+│ ✅ ANALYTICS                                                │
+│    • Dashboard unifié                                      │
+│    • Logs agrégés (Log Analytics)                          │
+│    • Workbooks pour visualisation                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  vs GESTION MANUELLE (Sans Firewall Manager)               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ❌ 100 firewalls = 100 configurations différentes            │
+│ ❌ Changer une règle = Modifier partout manuellement        │
+│ ❌ Risque de drift (règles disparates)                      │
+│ ❌ Pas de versionning des politiques                        │
+│ ❌ Logs éparpillés (pas de vue globale)                    │
+│ ❌ Scalabilité nightmare (ajouter région = chaos)          │
+│ ❌ Pas de gouvernance centrale (qui a changé quoi?)       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.4 Configuration: Créer une Policy Centralisée
+
+```azure-cli
+# Étape 1: Créer la Firewall Policy
+az network firewall policy create \
+  --name "CentralPolicy" \
+  --resource-group "MyRG" \
+  --location "eastus" \
+  --threat-intel-mode "Deny"
+
+# Étape 2: Créer un Rule Collection Group
+az network firewall policy rule-collection-group create \
+  --name "RCG-100" \
+  --firewall-policy "CentralPolicy" \
+  --resource-group "MyRG" \
+  --priority 100
+
+# Étape 3: Ajouter des Network Rules
+az network firewall policy rule-collection-group collection add-filter-collection \
+  --name "NetworkRules" \
+  --rule-collection-group-name "RCG-100" \
+  --firewall-policy "CentralPolicy" \
+  --resource-group "MyRG" \
+  --action Allow \
+  --rule-name "AllowSQL" \
+  --rule-type NetworkRule \
+  --priority 100 \
+  --source-addresses "10.50.0.0/16" \
+  --destination-addresses "10.0.2.0/24" \
+  --destination-ports "1433" \
+  --protocols "Tcp"
+
+# Étape 4: Appliquer la Policy à un Firewall
+az network firewall update \
+  --name "MyAzureFirewall" \
+  --resource-group "MyRG" \
+  --firewall-policy "CentralPolicy"
+
+# Étape 5: Vérifier
+az network firewall policy show \
+  --name "CentralPolicy" \
+  --resource-group "MyRG"
+```
+
+---
+
+## 6. 📊 Comparaison Globale: Tous les Types de Firewalls {#6-comparaison-globale-tous-les-types-de-firewalls}
+
+### 6.1 Tableau Comparatif Complet
+
+| Feature | Host-Based (Windows) | Host-Based (Linux) | Azure Firewall | Azure Firewall Manager | NSG |
+| --- | --- | --- | --- | --- | --- |
+| **Niveau Déploiement** | Machine individuelle | VM Linux | Réseau (VNet) | Central (multi-FW) | Subnet/NIC |
+| **Gestion** | Locale ou GPO | Configuration fichier | Portal/CLI | Policy centralisée | Portal/CLI |
+| **Scalabilité** | Par VM (manuel) | Par VM (manuel) | VNet complète | Multi-région | Par subnet |
+| **Inspection L7** | Limité | Non | ✅ Oui | ✅ Oui | Non |
+| **Coût** | Gratuit (Windows) | Gratuit | ~$1.5/h | Inclus | Gratuit |
+| **Logs Centralisés** | Non | Non | ✅ Log Analytics | ✅ Oui | ✅ Non (local) |
+| **Threat Intel** | Limité | Configuré | ✅ Microsoft | ✅ Centralisé | Non |
+| **DDoS Protection** | Basique | Basique | Limité | Limité | Non |
+| **VPN Support** | Non | Non | ✅ Oui | ✅ Oui | Non |
+| **Compliance** | Local audit | Local audit | ✅ Audit global | ✅ Audit + Versioning | ✅ Audit |
+| **Use Case** | Desktop/VM unique | Serveur Linux unique | Réseau production | Multi-région enterprise | Granulaire réseau |
+
+### 6.2 Matrice de Décision: Quel Firewall Choisir?
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                   DECISION TREE                               │
+├───────────────────────────────────────────────────────────────┤
+│                                                               │
+│  Besoin = Protéger UNE machine/VM?                           │
+│  YES → Host-Based Firewall (Windows/Linux)                   │
+│  NO → Continue...                                             │
+│                                                               │
+│  Besoin = Protéger UN réseau (VNet)?                         │
+│  YES & Budget limité → NSG                                   │
+│  YES & Besoin avancé → Azure Firewall                        │
+│  NO → Continue...                                             │
+│                                                               │
+│  Besoin = Gérer 5+ firewalls / multi-région?                 │
+│  YES → Azure Firewall Manager                                │
+│  NO → Azure Firewall seul                                    │
+│                                                               │
+│  Besoin = Inspection DPI + Threat Intel?                     │
+│  YES → Azure Firewall (Standard/Premium)                     │
+│  NO → NSG suffit                                              │
+│                                                               │
+│  Besoin = Compliance & Versioning?                           │
+│  YES → Azure Firewall Manager                                │
+│  NO → Firewall basique                                        │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### 6.3 Architectures: Combinaisons Typiques
+
+#### Scenario 1: Simple (Startup)
+
+```
+VNet (10.0.0.0/16)
+    ├─ App Subnet (10.0.1.0/24)
+    │   ├─ VM1 (Windows Firewall activé)
+    │   ├─ VM2 (Windows Firewall activé)
+    └─ DB Subnet (10.0.2.0/24)
+        ├─ NSG: Bloquer tout sauf port 1433 from App
+        └─ VM3 (Linux firewalld: port 1433 seul)
+
+✅ Cost-effective
+✅ Assez sûr pour startup
+❌ Gestion dispersée
+❌ Pas de logs centralisés
+```
+
+#### Scenario 2: Medium (PME Production)
+
+```
+VNet (10.0.0.0/16)
+    ├─ App Subnet (NSG: app-nsg)
+    │   ├─ VM1 (Windows Firewall: complément local)
+    │   ├─ VM2 (Windows Firewall: complément local)
+    ├─ DB Subnet (NSG: db-nsg stricte)
+    │   └─ VM3 (Linux firewalld: complément)
+    ├─ Firewall Subnet
+    │   └─ Azure Firewall (Standard)
+    │       └─ Policy manuelle
+    └─ Route Tables → tout traffic via Firewall
+
+✅ Inspection centralisée + locale
+✅ Logs agrégés
+✅ Logs + NSG + Host-based = Défense profonde
+❌ Gestion politique manuelle
+```
+
+#### Scenario 3: Enterprise Multi-Région
+
+```
+═══════════════════════════════════════════════════════════════
+
+  REGION: WEST EU              REGION: EAST EU
+  ┌──────────────────┐         ┌──────────────────┐
+  │ Secured VHub     │         │ Secured VHub     │
+  │ + FW (Built-in)  │         │ + FW (Built-in)  │
+  │ + VPN GW         │         │ + VPN GW         │
+  └────────┬─────────┘         └────────┬─────────┘
+           │                            │
+           └────────────────────────────┘
+                │    (VHub Peering)
+                │
+                ↓ All managed by:
+
+        AZURE FIREWALL MANAGER
+        ├─ Central Policy
+        │  ├─ Base Rules (NSG-like)
+        │  ├─ Application Rules
+        │  └─ Threat Intel: DENY
+        ├─ Rule Collection Groups
+        │  ├─ Priority 100: Foundational
+        │  ├─ Priority 200: Business Logic
+        │  └─ Priority 300: Exceptions
+        ├─ Versioning & Rollback
+        ├─ Audit Logs (Log Analytics)
+        └─ Compliance Reports
+
+        Each VHub Firewall:
+        ├─ Inherits Central Policy
+        ├─ Can extend with local rules
+        ├─ Managed identically
+        └─ Logs → Central Log Analytics
+
+✅ One policy = 2 regions
+✅ Compliance automatic
+✅ Scaling trivial
+✅ Logs centralized + aggregated
+✅ Threat intel synchronized
+
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
+## 7. 📊 Comparaison AWS vs Azure {#7-comparaison-aws-vs-azure}
 
 ### 4.1 VPN Gateway Comparison
 
@@ -530,12 +1191,12 @@ Azure Firewall peut bloquer les adresses IP/domaines **connus pour être malveil
 ```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                      DATACENTER ON-PREMISE                       │
-│                       10.50.0.0/16                                │
-│                                                                   │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │ Firewall Local & Router (Ex: Cisco, Fortinet, Palo Alto)   │ │
-│  │ IP Publique: 203.0.113.10                                  │ │
-│  └────────────────┬───────────────────────────────────────────┘ │
+│                       10.50.0.0/16                               │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │ Firewall Local & Router (Ex: Cisco, Fortinet, Palo Alto)   │  │
+│  │ IP Publique: 203.0.113.10                                  │  │
+│  └────────────────┬───────────────────────────────────────────┘  │
 └───────────────────┼──────────────────────────────────────────────┘
                     │
         ┌───────────┼──────────┐
@@ -634,7 +1295,7 @@ Azure Firewall peut bloquer les adresses IP/domaines **connus pour être malveil
                              │
                 ┌────────────┼────────────┐
                 │            │            │
-         ┌──────v────┐  ┌────v──────┐ ┌──v──────┐
+         ┌──────v────┐  ┌────v──────┐ ┌───v─────┐
          │ SPOKE 1   │  │ SPOKE 2   │ │ SPOKE 3 │
          │ 10.1.0.0  │  │ 10.2.0.0  │ │ 10.3.0  │
          │ /16       │  │ /16       │ │ .0/16   │
@@ -1934,16 +2595,16 @@ PROBLÈME: VM ne peut pas atteindre Internet
 └────────────────────────────────────────┘
 
 ÉTAPE 2: Vérifier l'état du Firewall
-┌────────────────────────────────────────┐
-│ az network firewall show \             │
-│   --name MyAzureFirewall \             │
-│   --resource-group MyRG                │
-│                                        │
-│ Check:                                 │
-│ • provisioningState = "Succeeded"?     │
-│ • threatIntelMode = "Deny"?            │
-│ • IP configurations (public + private)?│
-└────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ az network firewall show \              │
+│   --name MyAzureFirewall \              │
+│   --resource-group MyRG                 │
+│                                         │
+│ Check:                                  │
+│ • provisioningState = "Succeeded"?      │
+│ • threatIntelMode = "Deny"?             │
+│ • IP configurations (public + private)? │
+└─────────────────────────────────────────┘
 
 ÉTAPE 3: Vérifier les règles firewall
 ┌────────────────────────────────────────┐

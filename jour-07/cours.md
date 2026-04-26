@@ -100,7 +100,7 @@ az network vnet subnet create \
 Nous allons créer un seul NSG que nous associerons aux deux sous-réseaux. Les règles seront les suivantes :
 
 | Priorité | Nom | Source | Destination | Port | Protocole | Action |
-|----------|-----|--------|-------------|------|-----------|--------|
+| ---------- | ----- | -------- | ------------- | ------ | ----------- | -------- |
 | 100 | AllowSSHFromInternet | Votre IP publique | 10.0.1.0/24 (subnet public) | 22 | TCP | Allow |
 | 110 | AllowSSHFromPublicSubnet | 10.0.1.0/24 | 10.0.2.0/24 (subnet privé) | 22 | TCP | Allow |
 | 120 | AllowHTTP | Internet | 10.0.1.0/24 | 80 | TCP | Allow |
