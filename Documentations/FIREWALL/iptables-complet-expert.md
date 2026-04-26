@@ -79,7 +79,7 @@
      │  Routing Decision                        │
      │  Cible locale? → INPUT                   │
      │  Cible distante? → FORWARD               │
-      └──────────┬───────────────────────────────┘
+     └──────────┬───────────────────────────────┘
                 ↓
     ╔═════════════════════════════════════╗
     ║  LOCAL DESTINATION?                 ║
@@ -93,13 +93,13 @@
 │ mangle table   │    │ mangle table     │
 │ filter table   │    │ filter table     │
 │ security table │    │ security table   │
-└────────┬───────┘    └────────┬─────────┘
+└────────┬───────┘    └─────────┬────────┘
          ↓                      ↓
     ┌────────────┐        ┌──────────────┐
     │ Application│        │ Post Routing │
     │ (port 80)  │        │ (SNAT)       │
     └─────┬──────┘        └─────┬────────┘
-          ↓                      ↓
+          ↓                     ↓
      OUTPUT CHAIN         ┌────────────┐
      • mangle table       │ Interface  │
      • nat table (SNAT)   │ de sortie  │
