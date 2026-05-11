@@ -5,7 +5,17 @@ Voici **tous les éléments clés** à connaître dans ce cours.
 ***
 
 ### 1. Présentation de Microsoft Entra ID  
+
 - Microsoft Entra ID est la solution cloud de gestion des identités et des accès qui connecte les utilisateurs à leurs applications, appareils et données. [learn.microsoft](https://learn.microsoft.com/en-us/training/modules/explore-basic-services-identity-types/)
+- Les organisations utilisent l’ID Microsoft Entra pour permettre à leurs employés, invités, charges de travail et agents IA de se connecter et d’accéder aux ressources dont elles ont besoin, notamment :
+
+  - Ressources internes telles que les applications situées sur votre réseau d’entreprise et intranet, ainsi que les applications cloud développées par votre propre organisation.
+  - Services externes, tels que Microsoft 365, le portail Azure et toutes les applications SaaS utilisées par votre organisation.
+
+- Microsoft Entra ID simplifie la façon dont les organisations gèrent les autorisations et les accès en fournissant un seul système d’identité pour leurs applications cloud et locales. Vous pouvez synchroniser Microsoft Entra ID avec votre instance Active Directory locale et avec d’autres services d’annuaire ou l’utiliser en tant que service autonome.
+
+- Microsoft Entra ID permet également aux organisations d’autoriser l’utilisation d’appareils personnels, tels que des appareils mobiles et des tablettes, et d’autoriser la collaboration avec les partenaires commerciaux et les clients.
+
 - Objectif pédagogique : comprendre la fonction globale de Microsoft Entra ID dans un environnement cloud (Azure, M365, etc.). [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/7-summary-resources)
 
 ***
@@ -14,7 +24,8 @@ Voici **tous les éléments clés** à connaître dans ce cours.
 Le module détaille plusieurs catégories d’identités : [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/3-describe-identity-types)
 
 - **Identités utilisateur** : comptes utilisateurs gérés dans Microsoft Entra ID (internes, employés, etc.).  
-- **Identités de charge de travail (service principals / managed identities)** :  
+- **Identités de charge de travail (service principals / managed identities)** :
+(une **charge de travail** est un ensemble de ressources qui travaillent ensemble pour atteindre un objectif métier commun : application, API, base de données, stockage, réseau et opérations associées.)  
   - Principaux de service : identité d’une application ou d’un service. [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/3-describe-identity-types)
   - Identités managées (managed identities) :  
     - Affectées par le système (system-assigned).  

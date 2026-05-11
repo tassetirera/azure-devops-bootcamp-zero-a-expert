@@ -45,19 +45,34 @@
 
 > ⚠️ **Domaine le plus piégeux de l'examen. Ne pas négliger.**
 
+
 ### 1.1 Microsoft Entra ID (ancien Azure Active Directory)
 
 C'est l'**annuaire d'identités cloud** de Microsoft. Il gère **qui tu es** et **à quoi tu as accès**.
 
+**Définition pédagogique** :
+> Microsoft Entra ID (ex-Azure AD) est le service qui centralise l’authentification et l’autorisation de tous les utilisateurs, applications, appareils et services dans le cloud Microsoft. C’est le “passeport numérique” de ton organisation.
+
+**Schéma textuel** :
+```
+Utilisateur ↔ Entra ID ↔ Ressources (Azure, M365, SaaS)
+```
+
 #### Objets principaux
 
-| Objet | Description | Points clés |
-|---|---|---|
-| **User** | Personne physique | Peut être membre ou invité (B2B) |
-| **Group** | Ensemble d'users/SPs | Assigned ou Dynamic |
-| **Service Principal** | Identité d'une application | Créé automatiquement quand une app est enregistrée |
-| **Managed Identity** | SP géré par Azure | Pas de credentials à gérer |
-| **Application Registration** | Définition d'une app dans Entra | Crée un Service Principal associé |
+| Objet | Description | Points clés | Exemple concret |
+|---|---|---|---|
+| **User** | Personne physique | Peut être membre ou invité (B2B) | alice@contoso.com |
+| **Group** | Ensemble d'users/SPs | Assigned ou Dynamic | Groupe “Dév”, “RH” |
+| **Service Principal** | Identité d'une application | Créé automatiquement quand une app est enregistrée | Appli web qui accède à Azure |
+| **Managed Identity** | SP géré par Azure | Pas de credentials à gérer | VM Azure accédant à Key Vault |
+| **Application Registration** | Définition d'une app dans Entra | Crée un Service Principal associé | Enregistrement d’une API interne |
+
+**Astuce** :
+> Toujours privilégier Managed Identity pour les ressources Azure (plus sécurisé, pas de secrets à gérer).
+
+**Piège d’examen** :
+> Un Service Principal n’est pas un utilisateur humain : c’est l’identité d’une application !
 
 #### Licences Entra ID
 
@@ -67,28 +82,31 @@ C'est l'**annuaire d'identités cloud** de Microsoft. Il gère **qui tu es** et 
 | **P1** | Conditional Access, groupes dynamiques, MFA avancé, Self-Service Password Reset |Entreprise hybride (AD on-prem + Azure) |
 | **P2** | PIM (Privileged Identity Management), Identity Protection, Access Reviews |Conformité GDPR, audits stricts  [lemagit](https://www.lemagit.fr/conseil/Azure-AD-Premium-P1-ou-P2-lequel-vous-convient) |
 
+**Résumé** :
+- **Free** :
+    - Gestion simple des utilisateurs et groupes statiques
+    - SSO limité (10 apps max)
+    - Pas d'accès conditionnel ni MFA avancé
+- **P1** :
+    - Conditional Access (contrôle d’accès contextuel)
+    - Groupes dynamiques (ajout auto selon attributs)
+    - MFA avancé (app Authenticator)
+    - Self-Service Password Reset (SSPR)
+- **P2** :
+    - PIM (droits admin temporaires, audit)
+    - Identity Protection (détection IA des risques, blocage auto)
+    - Access Reviews (revues périodiques des accès)
 
-Une licence **Azure AD Free** offre les bases pour gérer des utilisateurs et groupes. Les versions **P1** et **P2** ajoutent des sécurités avancées pour entreprises. [blog.missud](https://blog.missud.me/2020/04/azure-active-directory-a-quoi-ai-je-droit/)
+**Astuce** :
+> Les groupes dynamiques et Conditional Access nécessitent **P1 minimum**.
 
-- **Free** : Les bases
-    - **Gestion simple** des utilisateurs et groupes statiques.  
-    - **SSO** limité (10 apps max).  
-    - Pas d'accès conditionnel ni **MFA** avancé. [lemagit](https://www.lemagit.fr/conseil/Azure-AD-Premium-P1-ou-P2-lequel-vous-convient)
+**Lien utile** : [Comparer les éditions Entra ID](https://learn.microsoft.com/fr-fr/azure/active-directory/fundamentals/active-directory-whatis#features-and-editions)
 
-- **P1** : Sécurité hybride
-    - **Conditional Access** : Bloque les connexions risquées (ex: depuis un pays suspect) selon règles précises.  
-    - **Groupes dynamiques** : Utilisateurs ajoutés auto selon attributs (ex: tous devs de Paris).  
-    - **MFA avancé** : Authentification multi-facteurs avec app Microsoft Authenticator.  
-    - **Self-Service Password Reset (SSPR)** : Users changent mot de passe seuls sans helpdesk. [fr.linkedin](https://fr.linkedin.com/learning/microsoft-azure-iaas-architecture-identites-et-securite/comparer-les-plans-p1-et-p2-de-microsoft-entra-id)
+**Piège d’examen** :
+> Beaucoup de fonctionnalités “sécurité avancée” (PIM, Identity Protection) sont **P2 uniquement**.
 
-- **P2** : Gouvernance + IA
-
-    - **PIM (Privileged Identity Management)** : Droits admin "juste-à-temps" (ex: active 1h, puis expire avec audit).  
-    - **Identity Protection** : IA détecte fuites (ex: login impossible depuis 2 pays), bloque auto ou force MFA.  
-    - **Access Reviews** : Revues périodiques des accès (ex: "cet user a-t-il encore besoin d'admin SQL ?"). [blog.missud](https://blog.missud.me/2020/04/azure-active-directory-a-quoi-ai-je-droit/)
-
-
-> 💡 **À retenir** : Les groupes dynamiques et Conditional Access nécessitent **P1 minimum**.
+**Exemple concret** :
+> Pour une PME qui veut juste gérer ses utilisateurs : Free suffit. Pour une grande entreprise avec sécurité renforcée : P2 obligatoire.
 
 ---
 
