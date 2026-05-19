@@ -78,7 +78,37 @@ Très bon choix : une **2e série de QCM orientée “scénarios” + un résu
 8. **c) Azure AD Connect** [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/3-describe-identity-types)
 9. **b) Principal de service / identité de service** [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/3-describe-identity-types)
 10. **b) Modèle cloud‑seul** [learn.microsoft](https://learn.microsoft.com/fr-fr/training/modules/explore-basic-services-identity-types/)
+## Corrections détaillées
 
+1. **b) Identité hybride**  
+   - Dans un environnement hybride, les comptes sont créés dans Active Directory local puis synchronisés vers Microsoft Entra ID via Azure AD Connect. Cela conserve la gestion locale tout en utilisant les services cloud.
+
+2. **c) Identité managée (managed identity)**  
+   - Une identité managée permet à une application Azure de s’authentifier auprès de Azure Key Vault sans stocker de secret. Azure gère automatiquement l’identité.
+
+3. **c) Azure AD B2C**  
+   - Azure AD B2C est conçu pour les clients grand public qui s’inscrivent et se connectent à une application. Ce n’est pas le service de synchronisation des identités d’entreprise.
+
+4. **c) Identité d’agent IA (Microsoft Entra Agent ID)**  
+   - Un bot ou un workflow automatisé doit être représenté par une identité d’agent IA. Cela permet de tracer et sécuriser ses actions indépendamment des utilisateurs humains.
+
+5. **b) Identité d’appareil**  
+   - Les PC Windows joints à Azure AD ou gérés par Intune obtiennent une identité d’appareil dans Entra ID pour l’authentification et la gestion du parc.
+
+6. **c) Identité d’invité (Azure AD B2B)**  
+   - Un partenaire externe ponctuel doit être invité en tant qu’utilisateur B2B. Cela évite la création d’un compte employé permanent et facilite la gestion des accès.
+
+7. **b) L’identité managée est aussi supprimée**  
+   - Une identité managée affectée par le système est liée à une ressource spécifique et est supprimée automatiquement si la ressource est détruite, évitant les identités orphelines.
+
+8. **c) Azure AD Connect**  
+   - Azure AD Connect est l’outil standard pour synchroniser les comptes d’Active Directory local vers Microsoft Entra ID dans un environnement hybride.
+
+9. **b) Principal de service / identité de service**  
+   - Pour une application interne appelant une API, un principal de service ou une identité de service permet l’authentification machine-à-machine sans mot de passe.
+
+10. **b) Modèle cloud‑seul**  
+    - Lorsque tous les comptes sont créés directement dans Microsoft Entra ID sans AD local, on parle de modèle cloud‑seul, contrairement au modèle hybride.
 Si tu veux, je peux détailler les explications pour chaque question.
 
 ***

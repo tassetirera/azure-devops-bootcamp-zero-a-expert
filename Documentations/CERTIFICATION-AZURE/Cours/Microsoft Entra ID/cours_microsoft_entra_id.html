@@ -1,0 +1,341 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.course-wrap{max-width:700px;margin:0 auto;padding:1.5rem 0}
+.nav-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-btn{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all .2s}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.nav-btn.active{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
+.progress-bar{height:3px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:1.5rem}
+.progress-fill{height:3px;background:#185FA5;border-radius:2px;transition:width .4s ease}
+.section{display:none}.section.active{display:block}
+.section-header{margin-bottom:1.5rem}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:#E6F1FB;color:#0C447C;margin-bottom:8px}
+.section-title{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1.3;margin-bottom:.5rem}
+.section-subtitle{font-size:15px;color:var(--color-text-secondary);line-height:1.6}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+.card-title{font-size:14px;font-weight:500;margin-bottom:.5rem;color:var(--color-text-primary)}
+.card-body{font-size:14px;color:var(--color-text-secondary);line-height:1.7}
+.highlight-box{background:#E6F1FB;border-radius:var(--border-radius-md);padding:1rem 1.25rem;margin:1rem 0}
+.highlight-box p{font-size:14px;color:#0C447C;line-height:1.7}
+.warning-box{background:#FAEEDA;border-radius:var(--border-radius-md);padding:1rem 1.25rem;margin:1rem 0}
+.warning-box p{font-size:14px;color:#633806;line-height:1.7}
+.success-box{background:#EAF3DE;border-radius:var(--border-radius-md);padding:1rem 1.25rem;margin:1rem 0}
+.success-box p{font-size:14px;color:#27500A;line-height:1.7}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.compare-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
+.compare-card.featured{border:2px solid #185FA5}
+.compare-header{font-size:13px;font-weight:500;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.compare-header i{font-size:18px}
+.compare-item{font-size:13px;color:var(--color-text-secondary);padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);line-height:1.5}
+.compare-item:last-child{border-bottom:none}
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+.plan-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;background:var(--color-background-primary)}
+.plan-card.featured{border:2px solid #185FA5}
+.plan-name{font-size:14px;font-weight:500;margin-bottom:.25rem}
+.plan-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:.75rem;background:#E6F1FB;color:#0C447C}
+.plan-feature{font-size:12px;color:var(--color-text-secondary);padding:4px 0;display:flex;gap:6px;line-height:1.4}
+.feat-check{color:#3B6D11;font-size:13px;flex-shrink:0}
+.feat-x{color:#A32D2D;font-size:13px;flex-shrink:0}
+.quiz-wrap{margin-top:1.5rem;border-top:0.5px solid var(--color-border-tertiary);padding-top:1.5rem}
+.quiz-q{font-size:15px;font-weight:500;margin-bottom:1rem;line-height:1.5}
+.quiz-option{display:block;width:100%;text-align:left;font-size:14px;padding:.75rem 1rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;margin-bottom:.5rem;transition:all .2s;line-height:1.4}
+.quiz-option:hover:not(.disabled){background:var(--color-background-secondary)}
+.quiz-option.correct{background:#EAF3DE;border-color:#639922;color:#27500A}
+.quiz-option.wrong{background:#FCEBEB;border-color:#E24B4A;color:#501313}
+.quiz-option.disabled{cursor:default}
+.quiz-feedback{font-size:13px;margin-top:.75rem;padding:.75rem 1rem;border-radius:var(--border-radius-md);display:none;line-height:1.6}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#EAF3DE;color:#27500A}
+.quiz-feedback.ko{background:#FCEBEB;color:#501313}
+.nav-actions{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
+.btn{font-size:14px;padding:.5rem 1.25rem;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185FA5;color:#E6F1FB;border-color:#185FA5}
+.btn-primary:hover{background:#0C447C;border-color:#0C447C;color:#E6F1FB}
+.btn:disabled{opacity:.4;cursor:default}
+.step-indicator{font-size:13px;color:var(--color-text-secondary)}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:.75rem 0}
+.tag{font-size:12px;padding:3px 10px;background:var(--color-background-secondary);border-radius:20px;color:var(--color-text-secondary)}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:1.25rem 0}
+.intro-hero{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+.intro-hero h1{font-size:22px;font-weight:500;margin-bottom:.5rem}
+.intro-hero p{font-size:14px;color:var(--color-text-secondary);line-height:1.7}
+.objectives{list-style:none;margin:.75rem 0}
+.objectives li{font-size:14px;color:var(--color-text-secondary);padding:6px 0 6px 24px;position:relative;border-bottom:0.5px solid var(--color-border-tertiary);line-height:1.5}
+.objectives li:last-child{border-bottom:none}
+.objectives li::before{content:"";width:7px;height:7px;background:#185FA5;border-radius:50%;position:absolute;left:4px;top:12px}
+.arch-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1rem 0}
+.arch-cell{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem;text-align:center}
+.arch-cell i{font-size:24px;color:#185FA5;margin-bottom:.5rem;display:block}
+.arch-cell .arch-label{font-size:12px;font-weight:500;margin-bottom:.25rem}
+.arch-cell .arch-sub{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+</style>
+
+<div class="course-wrap">
+<h2 class="sr-only">Cours complet — Microsoft Entra ID (anciennement Azure Active Directory)</h2>
+
+<div class="intro-hero">
+<div class="badge">Microsoft Learn · Adapté en français</div>
+<h1>Comprendre Microsoft Entra ID</h1>
+<p>Anciennement Azure Active Directory (Azure AD) — Un service cloud de gestion des identités et des accès, redessiné pour le monde multicloud et multiplateformes.</p>
+</div>
+
+<div class="nav-bar" id="navBar"></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+
+<div id="sections"></div>
+
+<div class="nav-actions">
+<button class="btn" id="prevBtn" onclick="navigate(-1)" disabled>← Précédent</button>
+<span class="step-indicator" id="stepLabel">1 / 5</span>
+<button class="btn btn-primary" id="nextBtn" onclick="navigate(1)">Suivant →</button>
+</div>
+</div>
+
+<script>
+const sections = [
+{
+  id:'intro', label:'Introduction', badge:'Module 1',
+  title:'Qu\'est-ce que Microsoft Entra ID ?',
+  subtitle:'Un service cloud de gestion des identités et des accès (IAM) fourni par Microsoft.',
+  content:`
+  <div class="highlight-box"><p><strong>Ancien nom :</strong> Azure Active Directory (Azure AD) a été officiellement renommé <em>Microsoft Entra ID</em> le 1er octobre 2023, afin de mieux refléter ses capacités multicloud et multiplateformes.</p></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-shield-check" aria-hidden="true"></i> Définition</div>
+    <div class="card-body">Microsoft Entra ID est un service cloud qui permet aux organisations de gérer les identités de leurs utilisateurs et de contrôler l'accès à leurs ressources — qu'elles soient dans le cloud ou sur site.</div>
+  </div>
+  <p style="font-size:14px;color:var(--color-text-secondary);margin:.75rem 0 .5rem;font-weight:500">Ce que Microsoft Entra ID permet concrètement :</p>
+  <div class="arch-row">
+    <div class="arch-cell"><i class="ti ti-user-check" aria-hidden="true"></i><div class="arch-label">Authentification</div><div class="arch-sub">Vérifier l'identité des utilisateurs</div></div>
+    <div class="arch-cell"><i class="ti ti-lock-access" aria-hidden="true"></i><div class="arch-label">Autorisation</div><div class="arch-sub">Contrôler l'accès aux ressources</div></div>
+    <div class="arch-cell"><i class="ti ti-device-laptop" aria-hidden="true"></i><div class="arch-label">SSO</div><div class="arch-sub">Une seule connexion pour tout</div></div>
+  </div>
+  <div class="divider"></div>
+  <p style="font-size:14px;color:var(--color-text-secondary);margin-bottom:.5rem;font-weight:500">Ressources accessibles via Entra ID :</p>
+  <div class="tag-row">
+    <span class="tag">Microsoft 365</span><span class="tag">Portail Azure</span><span class="tag">Applications SaaS</span><span class="tag">Applications internes</span><span class="tag">Applications cloud personnalisées</span>
+  </div>
+  <div class="warning-box"><p><strong>À retenir :</strong> Entra ID n'est pas simplement un annuaire. C'est une solution complète couvrant la gestion des identités, l'application de stratégies d'accès, et la sécurisation des données — dans le cloud <em>et</em> sur site.</p></div>
+  <p style="font-size:14px;font-weight:500;margin:.75rem 0 .5rem">Objectifs de ce cours :</p>
+  <ul class="objectives">
+    <li>Décrire Microsoft Entra ID et ses fonctionnalités clés</li>
+    <li>Comparer Entra ID à Active Directory Domain Services (AD DS)</li>
+    <li>Comprendre le rôle d'Entra ID comme annuaire pour les applications cloud</li>
+    <li>Distinguer les offres Entra ID P1 et P2</li>
+    <li>Explorer Microsoft Entra Domain Services</li>
+  </ul>
+  `,
+  quiz:{q:'Quel était le nom d\'Azure Active Directory avant le renommage officiel d\'octobre 2023 ?',opts:['Microsoft Entra ID','Azure AD (Azure Active Directory)','Windows Active Directory','Microsoft Identity Platform'],correct:1,ok:'Exact ! Azure Active Directory (Azure AD) est devenu Microsoft Entra ID le 1er octobre 2023. Les fonctionnalités restent identiques.',ko:'Pas tout à fait. Azure Active Directory, souvent abrégé Azure AD, est l\'ancien nom du service.'}
+},
+{
+  id:'adlds', label:'vs AD DS', badge:'Module 2',
+  title:'Entra ID vs Active Directory Domain Services',
+  subtitle:'Deux services complémentaires mais fondamentalement différents dans leur conception et leurs usages.',
+  content:`
+  <div class="highlight-box"><p>La confusion est fréquente : Microsoft Entra ID n'est <strong>pas</strong> une simple version cloud d'Active Directory Domain Services. Ce sont deux produits distincts avec des architectures différentes.</p></div>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <div class="compare-header"><i class="ti ti-server" aria-hidden="true"></i> AD DS (On-premises)</div>
+      <div class="compare-item">Protocoles : LDAP, Kerberos, NTLM</div>
+      <div class="compare-item">Jointure de domaine (domain join)</div>
+      <div class="compare-item">Stratégie de groupe (GPO)</div>
+      <div class="compare-item">Infrastructure gérée par l'entreprise</div>
+      <div class="compare-item">Contrôleurs de domaine sur site</div>
+      <div class="compare-item">Conçu pour les réseaux locaux</div>
+    </div>
+    <div class="compare-card featured">
+      <div class="compare-header" style="color:#185FA5"><i class="ti ti-cloud" aria-hidden="true"></i> Microsoft Entra ID</div>
+      <div class="compare-item">Protocoles : OAuth 2.0, OIDC, SAML</div>
+      <div class="compare-item">Enregistrement d'appareil (device registration)</div>
+      <div class="compare-item">Accès conditionnel (Conditional Access)</div>
+      <div class="compare-item">Service cloud managé par Microsoft</div>
+      <div class="compare-item">Aucune infrastructure à gérer</div>
+      <div class="compare-item">Conçu pour internet et le cloud</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="card">
+    <div class="card-title">Structure des objets</div>
+    <div class="card-body">AD DS organise les objets en <em>forêts, domaines et unités d'organisation (OU)</em>. Microsoft Entra ID utilise une structure plate de <em>locataires (tenants)</em> sans concept de forêt ni d'OU. Cela simplifie la gestion mais change la logique d'administration.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Identités prises en charge</div>
+    <div class="card-body">AD DS gère principalement les comptes utilisateurs et ordinateurs dans un réseau Windows. Entra ID gère en plus les <em>identités externes</em> (partenaires B2B, invités), les <em>identités de charge de travail</em> (applications, services), et les <em>identités d'appareils</em> multiplateforme (Windows, iOS, Android, macOS).</div>
+  </div>
+  <div class="success-box"><p><strong>Coexistence possible :</strong> Les organisations peuvent utiliser <em>Microsoft Entra Connect</em> pour synchroniser les utilisateurs et groupes d'AD DS vers Entra ID, créant ainsi un environnement d'<strong>identité hybride</strong> — le meilleur des deux mondes.</p></div>
+  `,
+  quiz:{q:'Quel protocole Microsoft Entra ID utilise-t-il pour l\'authentification moderne, contrairement à AD DS qui utilise Kerberos ?',opts:['LDAP','NTLM','OAuth 2.0 / OpenID Connect','SMB'],correct:2,ok:'Correct ! Entra ID s\'appuie sur les protocoles modernes OAuth 2.0 et OpenID Connect (OIDC) adaptés au web et au cloud.',ko:'Non. Entra ID utilise OAuth 2.0 et OpenID Connect (OIDC), des protocoles conçus pour les applications web modernes.'}
+},
+{
+  id:'apps', label:'Annuaire cloud', badge:'Module 3',
+  title:'Entra ID comme annuaire pour les apps cloud',
+  subtitle:'Microsoft Entra ID est le socle d\'identité pour les applications modernes — internes, SaaS, et personnalisées.',
+  content:`
+  <div class="card">
+    <div class="card-title"><i class="ti ti-apps" aria-hidden="true"></i> Rôle d'annuaire d'applications</div>
+    <div class="card-body">En tant qu'annuaire cloud, Entra ID stocke et gère les identités d'application (app registrations), permettant aux apps de s'authentifier et d'accéder à des ressources de façon sécurisée et standardisée.</div>
+  </div>
+  <div class="arch-row">
+    <div class="arch-cell"><i class="ti ti-key" aria-hidden="true"></i><div class="arch-label">SSO</div><div class="arch-sub">Authentification unique pour toutes les apps</div></div>
+    <div class="arch-cell"><i class="ti ti-link" aria-hidden="true"></i><div class="arch-label">Intégration SaaS</div><div class="arch-sub">Milliers d'apps pré-intégrées (Salesforce, Slack...)</div></div>
+    <div class="arch-cell"><i class="ti ti-code" aria-hidden="true"></i><div class="arch-label">App perso.</div><div class="arch-sub">Vos propres apps via Microsoft Graph</div></div>
+  </div>
+  <div class="divider"></div>
+  <p style="font-size:14px;font-weight:500;margin-bottom:.75rem">Types d'applications pris en charge :</p>
+  <div class="card">
+    <div class="card-title">Applications Microsoft 365</div>
+    <div class="card-body">Teams, Outlook, SharePoint, OneDrive… Toutes utilisent Entra ID pour l'authentification. L'utilisateur se connecte une seule fois et accède à l'ensemble de la suite.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Applications SaaS tierces</div>
+    <div class="card-body">La galerie d'applications Entra ID contient plus de 3 000 applications pré-intégrées (Salesforce, ServiceNow, Dropbox, GitHub…), configurables en quelques clics avec SSO et provisionnement automatique.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Applications métier personnalisées</div>
+    <div class="card-body">Vos propres applications web, API ou mobiles peuvent être enregistrées dans Entra ID pour bénéficier de l'authentification OAuth 2.0/OIDC, de l'accès conditionnel et de la MFA sans réinventer la gestion des identités.</div>
+  </div>
+  <div class="highlight-box"><p><strong>Proxy d'application (Application Proxy) :</strong> Permet de publier de façon sécurisée des applications locales (intranets, apps héritées) sur internet via Entra ID, sans VPN ni DMZ. Les utilisateurs accèdent à leurs apps internes comme à n'importe quelle app cloud.</p></div>
+  `,
+  quiz:{q:'Qu\'est-ce que le "Proxy d\'application" dans Microsoft Entra ID ?',opts:['Un pare-feu réseau','Un outil pour publier des apps locales sécurisément sur internet sans VPN','Un annuaire LDAP dans le cloud','Un outil de monitoring des applications'],correct:1,ok:'Parfait ! Le Proxy d\'application Entra ID permet d\'exposer des applications internes (hébergées sur site) sur internet, de façon sécurisée, sans VPN.',ko:'Non. Le Proxy d\'application est une fonctionnalité qui permet de publier des applications locales sur internet de façon sécurisée, sans VPN ni DMZ.'}
+},
+{
+  id:'tiers', label:'Licences P1 & P2', badge:'Module 4',
+  title:'Microsoft Entra ID — Éditions et licences',
+  subtitle:'Trois niveaux d\'offres pour répondre aux besoins de toutes les organisations.',
+  content:`
+  <div class="plan-grid">
+    <div class="plan-card">
+      <div class="plan-name">Entra ID Gratuit</div>
+      <div class="plan-badge">Inclus dans Azure</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Gestion des utilisateurs et groupes</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>SSO (jusqu'à 10 apps)</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Authentification MFA basique</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>B2B Collaboration</div>
+      <div class="plan-feature"><span class="feat-x">✗</span>Accès conditionnel</div>
+      <div class="plan-feature"><span class="feat-x">✗</span>Identity Protection</div>
+      <div class="plan-feature"><span class="feat-x">✗</span>PIM (Privileged Identity)</div>
+    </div>
+    <div class="plan-card featured">
+      <div class="plan-name" style="color:#185FA5">Entra ID P1</div>
+      <div class="plan-badge">Microsoft 365 E3 / EMS E3</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Tout du niveau gratuit</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Accès conditionnel</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>SSO illimité</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Identité hybride (Entra Connect)</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Groupes dynamiques</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Réinitialisation mdp self-service</div>
+      <div class="plan-feature"><span class="feat-x">✗</span>Identity Protection avancée</div>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Entra ID P2</div>
+      <div class="plan-badge">Microsoft 365 E5 / EMS E5</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Tout de P1</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Identity Protection (IA)</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Privileged Identity Mgmt (PIM)</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Access Reviews</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Détection des risques</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Connexions à risque bloquées</div>
+      <div class="plan-feature"><span class="feat-check">✓</span>Gouvernance des identités</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-shield" aria-hidden="true"></i> Entra ID P2 — Identity Protection</div>
+    <div class="card-body">Utilise l'apprentissage automatique pour détecter les <em>connexions inhabituelles</em>, les fuites de mots de passe, les connexions depuis des adresses IP suspectes ou des appareils potentiellement compromis. Peut bloquer automatiquement les accès à risque.</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-crown" aria-hidden="true"></i> Entra ID P2 — Privileged Identity Management (PIM)</div>
+    <div class="card-body">Permet d'attribuer des rôles d'administration <em>juste à temps</em> (just-in-time) et pour une durée limitée. Réduit drastiquement la surface d'attaque liée aux comptes admin permanents. Génère des audits détaillés de chaque élévation de privilège.</div>
+  </div>
+  <div class="highlight-box"><p><strong>Inclusions Microsoft 365 :</strong> Entra ID Gratuit est inclus avec tout abonnement Azure. P1 est inclus dans Microsoft 365 E3 et Business Premium. P2 est inclus dans Microsoft 365 E5.</p></div>
+  `,
+  quiz:{q:'Quelle fonctionnalité de Entra ID P2 permet d\'attribuer des droits d\'administration temporaires et "juste à temps" ?',opts:['Accès conditionnel','Groupes dynamiques','Privileged Identity Management (PIM)','Application Proxy'],correct:2,ok:'Exact ! PIM (Privileged Identity Management) est une fonctionnalité exclusive d\'Entra ID P2 qui permet de limiter les droits admin dans le temps pour réduire les risques.',ko:'Non. Il s\'agit du Privileged Identity Management (PIM), disponible uniquement dans Entra ID P2.'}
+},
+{
+  id:'domainsvcs', label:'Domain Services', badge:'Module 5',
+  title:'Microsoft Entra Domain Services',
+  subtitle:'Des services de domaine managés dans le cloud — sans gérer de contrôleurs de domaine.',
+  content:`
+  <div class="highlight-box"><p><strong>Problème résolu :</strong> Certaines applications héritées nécessitent des fonctionnalités AD classiques (LDAP, Kerberos, NTLM, GPO). Entra Domain Services les fournit dans Azure, sans déployer et maintenir des contrôleurs de domaine.</p></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-server-2" aria-hidden="true"></i> Qu'est-ce que c'est ?</div>
+    <div class="card-body">Microsoft Entra Domain Services est un service Azure managé qui fournit un domaine managé compatible avec Active Directory classique. Microsoft crée et opère des contrôleurs de domaine Windows Server dans la région Azure choisie — l'organisation n'a rien à déployer ni à maintenir.</div>
+  </div>
+  <p style="font-size:14px;font-weight:500;margin:.75rem 0 .5rem">Protocoles pris en charge :</p>
+  <div class="tag-row">
+    <span class="tag">LDAP</span><span class="tag">Kerberos</span><span class="tag">NTLM</span><span class="tag">Stratégie de groupe (GPO)</span><span class="tag">Jointure de domaine</span>
+  </div>
+  <div class="divider"></div>
+  <div class="arch-row">
+    <div class="arch-cell"><i class="ti ti-refresh" aria-hidden="true"></i><div class="arch-label">Synchronisation</div><div class="arch-sub">Sync unidirectionnelle depuis Entra ID</div></div>
+    <div class="arch-cell"><i class="ti ti-adjustments" aria-hidden="true"></i><div class="arch-label">Managé</div><div class="arch-sub">Réplication, patches et sauvegardes gérés par Microsoft</div></div>
+    <div class="arch-cell"><i class="ti ti-building-warehouse" aria-hidden="true"></i><div class="arch-label">Migration</div><div class="arch-sub">Apps héritées vers Azure sans refonte</div></div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-title">Scénarios d'usage typiques</div>
+    <div class="card-body">
+      <strong>1. Migration d'apps héritées :</strong> Des applications qui ne supportent pas les protocoles modernes (OAuth/OIDC) mais utilisent LDAP ou Kerberos peuvent être migrées vers Azure en rejoignant le domaine managé.<br><br>
+      <strong>2. Abandon de l'infrastructure AD on-premises :</strong> Les organisations souhaitant migrer vers le cloud sans maintenir des serveurs AD locaux peuvent utiliser Entra Domain Services comme pont.<br><br>
+      <strong>3. Scénarios hybrides :</strong> Les utilisateurs s'authentifient avec leurs identifiants Entra ID existants sur des VMs jointes au domaine managé.
+    </div>
+  </div>
+  <div class="warning-box"><p><strong>Limites importantes :</strong> Entra Domain Services n'est pas gérable comme un AD classique. Vous ne pouvez pas étendre le schéma, créer des forêts ou des trusts complexes, ni accéder directement aux contrôleurs de domaine. C'est un service entièrement managé.</p></div>
+  <div class="success-box"><p><strong>Résumé de l'écosystème :</strong> Microsoft Entra ID (identités cloud modernes) + Entra Connect (synchronisation hybride) + Entra Domain Services (apps héritées cloud) = une stratégie d'identité complète pour toutes les situations.</p></div>
+  `,
+  quiz:{q:'Quel est le principal avantage de Microsoft Entra Domain Services par rapport à AD DS classique dans le cloud ?',opts:['Il supporte OAuth 2.0 nativement','Il élimine le besoin de gérer des contrôleurs de domaine — Microsoft s\'en charge','Il est gratuit pour tous les abonnements Azure','Il remplace entièrement Active Directory on-premises'],correct:1,ok:'Parfait ! L\'avantage clé est que Microsoft déploie, gère et maintient les contrôleurs de domaine. L\'organisation bénéficie des fonctionnalités AD sans gérer l\'infrastructure.',ko:'Non. L\'avantage principal est que Microsoft gère entièrement l\'infrastructure des contrôleurs de domaine — réplication, patches, sauvegardes.'}
+}
+];
+
+let current = 0;
+let answered = {};
+
+function render(){
+  const navBar = document.getElementById('navBar');
+  navBar.innerHTML = sections.map((s,i)=>`<button class="nav-btn${i===current?' active':''}" onclick="goTo(${i})">${s.label}</button>`).join('');
+  document.getElementById('progressFill').style.width=((current+1)/sections.length*100)+'%';
+  document.getElementById('stepLabel').textContent=(current+1)+' / '+sections.length;
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').textContent=current===sections.length-1?'Terminer ✓':'Suivant →';
+
+  const container = document.getElementById('sections');
+  const s = sections[current];
+  const ans = answered[current];
+  const qDisabled = ans!==undefined;
+
+  container.innerHTML=`
+  <div class="section active">
+    <div class="section-header">
+      <div class="badge">${s.badge}</div>
+      <div class="section-title">${s.title}</div>
+      <div class="section-subtitle">${s.subtitle}</div>
+    </div>
+    ${s.content}
+    <div class="quiz-wrap">
+      <div class="quiz-q"><i class="ti ti-help-circle" aria-hidden="true"></i> Question de compréhension</div>
+      <p style="font-size:15px;margin-bottom:.75rem;line-height:1.5">${s.quiz.q}</p>
+      ${s.quiz.opts.map((o,i)=>`
+        <button class="quiz-option${qDisabled?' disabled':''}${qDisabled&&i===s.quiz.correct?' correct':''}${qDisabled&&ans===i&&i!==s.quiz.correct?' wrong':''}" 
+          onclick="${qDisabled?'':'answer('+i+')'}">${o}</button>
+      `).join('')}
+      <div class="quiz-feedback${qDisabled?' show':''}${qDisabled?(ans===s.quiz.correct?' ok':' ko'):''}">
+        ${qDisabled?(ans===s.quiz.correct?'✓ '+s.quiz.ok:'✗ '+s.quiz.ko):''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function answer(i){
+  answered[current]=i;
+  render();
+}
+function navigate(dir){
+  current=Math.max(0,Math.min(sections.length-1,current+dir));
+  render();
+  document.querySelector('.course-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function goTo(i){current=i;render();}
+
+render();
+</script>

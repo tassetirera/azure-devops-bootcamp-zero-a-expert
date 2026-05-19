@@ -12,7 +12,7 @@ Service cloud de gestion des identités et des accès (IAM) de Microsoft. Il aut
 ### IAM (Identity and Access Management)
 Ensemble de fonctions pour gérer qui peut se connecter, à quoi ils ont accès, et comment les autorisations sont accordées ou révoquées.
 
-### Tenant
+### Tenant / Locataire Microsoft Entra ID
 Instance isolée de Microsoft Entra ID associée à une organisation. Chaque tenant a son propre annuaire d’identités et de rôles.
 
 ### Subscription (abonnement)
@@ -226,3 +226,62 @@ Gestion d’identité des clients finaux (consommateurs) avec des scénarios d�
 - Entra ID ne remplace pas immédiatement AD DS, mais il complète et modernise l’identité.
 - La synchronisation hybride est fréquente dans les entreprises qui migrent progressivement vers le cloud.
 - Entra ID est le cœur de l’authentification dans Azure, Microsoft 365 et bien d’autres applications SaaS.
+
+---
+
+## 12. Schéma hiérarchique Microsoft Entra ID
+
+```
+Organisation
+│
+├── Locataire Microsoft Entra (annuaire) ou Tenant
+│   ├── Utilisateurs, groupes, appareils
+│   ├── Applications (registrées dans Entra)
+│   └── Accès (RBAC global, politiques, etc.)
+│
+└── Abonnement Azure (ou plusieurs)
+    │
+    ├── Abonnement Azure 1 (ex. Production)
+    │   ├── Rôle / RBAC par locataire
+    │   ├── Facturation / Quotas
+    │   │
+    │   └── Groupes de ressources
+    │       ├── Ressource Group 1 – rg-prod-web
+    │       │   ├── App Service (site web prod)
+    │       │   ├── Application Gateway
+    │       │   └── Azure Monitor
+    │       │
+    │       ├── Ressource Group 2 – rg-prod-db
+    │       │   ├── Azure SQL Managed Instance
+    │       │   ├── Azure Cache for Redis
+    │       │   └── Log Analytics Workspace
+    │       │
+    │       └── Ressource Group 3 – rg-prod-network
+    │           ├── VNet, subnets
+    │           ├── Azure Firewall
+    │           └── Private DNS zones
+    │
+    ├── Abonnement Azure 2 (ex. Non‑prod)
+    │   ├── Rôle / RBAC par locataire
+    │   ├── Facturation / Quotas
+    │   │
+    │   └── Groupes de ressources
+    │       ├── Ressource Group 1 – rg-dev-web
+    │       ├── Ressource Group 2 – rg-dev-db
+    │       └── Ressource Group 3 – rg-dev-network
+    │
+    └── Abonnement Azure 3 (ex. Data / Analytique)
+        ├── Rôle / RBAC par locataire
+        ├── Facturation / Quotas
+        │
+        └── Groupes de ressources
+            ├── Ressource Group 1 – rg-data-dwh
+            ├── Ressource Group 2 – rg-data-powerbi
+            └── Ressource Group 3 – rg-data-logs
+```
+
+### Explication
+
+- **Un locataire Entra** gère **toute l’identité** (utilisateurs, groupes, apps) et peut être associé à **plusieurs abonnements Azure**. [learn.microsoft](https://learn.microsoft.com/fr-fr/entra/fundamentals/how-subscriptions-associated-directory)
+- **Chaque abonnement** correspond à un **cadre de facturation / quota**. [learn.microsoft](https://learn.microsoft.com/fr-fr/azure/cost-management-billing/manage/cloud-subscription)
+- **Les groupes de ressources** servent à **regrouper les ressources par environnement / fonction** (web, db, réseau, etc.), tout en restant dans un seul abonnement. [openhost-network](https://www.openhost-network.com/blog/azure-hierarchie-ressources/)

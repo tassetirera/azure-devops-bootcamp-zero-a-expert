@@ -110,7 +110,7 @@ Une licence **Azure AD Free** offre les bases pour gérer des utilisateurs et gr
 
 Permet à une ressource Azure (VM, App Service, Function…) de s'authentifier auprès d'autres services Azure **sans gérer de secrets**.
 
-#### System-assigned
+#### 1.3.1 System-assigned
 ```
 VM <──── Managed Identity (liée à la VM)
          ↓
@@ -119,7 +119,7 @@ VM <──── Managed Identity (liée à la VM)
 - Liée à **une seule ressource**
 - Cycle de vie lié à la ressource
 
-#### User-assigned
+#### 1.3.2 User-assigned
 ```
 App Service ──┐
               ├──── Managed Identity (indépendante)
@@ -130,6 +130,40 @@ VM ───────────┘
 - Survit à la suppression des ressources
 
 > 💡 **Cas d'usage typique** : Ta VM doit accéder à Key Vault → tu lui assigne une Managed Identity, tu lui donnes le rôle **Key Vault Secrets User** sur le Key Vault. Plus besoin de stocker de secret.
+
+
+
+
+
+
+####  1.3.3 Principal de service vs identité managée
+
+Le **principal de service** est une identité d’application dans Microsoft Entra ID que tu gères toi-même, souvent avec un secret ou un certificat, alors que l’**identité managée** est une identité gérée automatiquement par Azure pour une ressource Azure, sans secret à administrer. [oasis](https://www.oasis.security/blog/service-principal-vs-managed-identity-in-azure)
+
+##### Différence simple
+
+- **Principal de service** = identité d’une application, plus flexible, utilisable aussi hors Azure, mais tu dois gérer les identifiants, leur rotation et la sécurité. [learn.microsoft](https://learn.microsoft.com/fr-fr/azure/devops/integrate/get-started/authentication/service-principal-managed-identity?view=azure-devops)
+- **Identité managée** = identité “sans secret” attachée à une ressource Azure, idéale pour les VM, App Service, Functions, etc.. [learn.microsoft](https://learn.microsoft.com/fr-fr/entra/identity/managed-identities-azure-resources/overview)
+
+##### Quand utiliser quoi
+
+- Utilise un **principal de service** si ton application tourne **en dehors d’Azure**, dans un pipeline CI/CD, sur site, ou dans un outil tiers. [oasis](https://www.oasis.security/blog/service-principal-vs-managed-identity-in-azure)
+- Utilise une **identité managée** si la charge de travail est **dans Azure** et que la plateforme cible la prend en charge, car Azure gère les identifiants à ta place. [learn.microsoft](https://learn.microsoft.com/fr-fr/entra/identity/managed-identities-azure-resources/overview)
+
+##### Sécurité
+
+- Le principal de service demande une vraie discipline sur les secrets, les expirations et la rotation. [learn.microsoft](https://learn.microsoft.com/fr-fr/azure/devops/integrate/get-started/authentication/service-principal-managed-identity?view=azure-devops)
+- L’identité managée réduit fortement le risque de fuite de secret, car il n’y a pas de mot de passe ou secret à stocker dans le code ou dans la config. [oasis](https://www.oasis.security/blog/service-principal-vs-managed-identity-in-azure)
+
+##### Règle pratique
+
+- **Par défaut : identité managée** pour tout workload Azure-native. [learn.microsoft](https://learn.microsoft.com/fr-fr/entra/identity/managed-identities-azure-resources/overview)
+- **Sinon : principal de service** quand tu as besoin d’une identité pour une exécution externe à Azure ou un scénario non compatible. [learn.microsoft](https://learn.microsoft.com/fr-fr/azure/devops/integrate/get-started/authentication/service-principal-managed-identity?view=azure-devops)
+
+##### Résumé entretien
+
+- **Principal de service** : “je crée et je protège l’identité”.
+- **Identité managée** : “Azure crée et protège l’identité pour moi”. [oasis](https://www.oasis.security/blog/service-principal-vs-managed-identity-in-azure)
 
 ---
 

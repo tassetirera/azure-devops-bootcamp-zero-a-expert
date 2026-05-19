@@ -68,7 +68,14 @@ Plateforme:       Pearson VUE
    • Alerts & Logs
    • Application Insights
 ```
+- [Identités et Gouvernance](https://learn.microsoft.com/fr-fr/training/paths/az-104-manage-identities-governance/)
+- [Stockage ](https://learn.microsoft.com/fr-fr/training/paths/az-104-manage-storage/)
 
+- [Réseaux Virtuels](https://learn.microsoft.com/fr-fr/training/paths/az-104-manage-virtual-networks/)
+
+- [Calcul](https://learn.microsoft.com/fr-fr/training/paths/az-104-manage-compute-resources/)
+
+- [Surveillance](https://learn.microsoft.com/fr-fr/training/paths/az-104-monitor-backup-resources/)
 ### Prérequis
 
 ```
